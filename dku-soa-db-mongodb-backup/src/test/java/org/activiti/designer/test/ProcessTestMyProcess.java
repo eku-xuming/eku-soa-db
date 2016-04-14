@@ -12,14 +12,10 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.history.HistoricVariableInstance;
-import org.activiti.engine.history.HistoricVariableUpdate;
 import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.ActivitiRule;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,24 +49,18 @@ public class ProcessTestMyProcess {
 		repositoryService.createDeployment().addInputStream("transaction.bpmn20.xml", new FileInputStream(filename))
 				.deploy();
 		Map<String, Object> variableMap = new HashMap<String, Object>();
-		variableMap.put("rollback", "false");
+		variableMap.put("rollback", Boolean.TRUE);
 		variableMap.put("from_balance", 3000);
 		variableMap.put("to_balance", 1000);
 		variableMap.put("amount", 100);
-		variableMap.put("as", "100");
+		variableMap.put("error_event", true);
 
 		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess", variableMap);
 		assertNotNull(processInstance.getId());
 		System.out.println("id " + processInstance.getId() + " " + processInstance.getProcessDefinitionId());
 
-		System.out.println(processInstance.isEnded());
+		System.out.println(String.format("流程实例是否结束:\t%s", processInstance.isEnded()));
 
-		List<HistoricDetail> list = historyService.createHistoricDetailQuery()
-				.processInstanceId(processInstance.getId()).list();
-		for (HistoricDetail detail : list) {
-			HistoricVariableUpdate hv = (HistoricVariableUpdate) detail;
-			System.out.println(hv.getValue());
-		}
 		/////////////////////////////
 
 		List<HistoricVariableInstance> hlist = historyService.createHistoricVariableInstanceQuery()

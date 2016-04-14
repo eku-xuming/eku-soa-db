@@ -11,7 +11,7 @@
     </startEvent>
     <transaction id="transaction1" name="Transaction">
       <startEvent id="startevent2" name="Start"></startEvent>
-      <scriptTask scriptFormat="javascript" id="scripttask1" name="转出" activiti:autoStoreVariables="false">
+      <scriptTask id="scripttask1" name="转出" scriptFormat="javascript" activiti:autoStoreVariables="false">
         <script><![CDATA[var from_balance = execution.getVariable("from_balance");
 var to_balance = execution.getVariable("to_balance");
 var amount = execution.getVariable("amount");
@@ -19,10 +19,14 @@ var amount = execution.getVariable("amount");
 execution.setVariable("from_balance",from_balance-amount);]]></script>
       </scriptTask>
       <sequenceFlow id="flow3" sourceRef="startevent2" targetRef="scripttask1"></sequenceFlow>
-      <scriptTask scriptFormat="javascript" id="scripttask2" name="转入" activiti:autoStoreVariables="false">
+      <scriptTask id="scripttask2" name="转入" scriptFormat="javascript" activiti:autoStoreVariables="false">
         <script><![CDATA[var from_balance = execution.getVariable("from_balance");
 var to_balance = execution.getVariable("to_balance");
 var amount = execution.getVariable("amount");
+var error_event = execution.getVariable("error_event");
+if(error_event==true){
+	throw new org.activiti.engine.delegate.BpmnError("NORMAL_ERROR");
+}
 
 execution.setVariable("to_balance", to_balance+amount);]]></script>
       </scriptTask>
@@ -45,14 +49,14 @@ execution.setVariable("to_balance", to_balance+amount);]]></script>
       <boundaryEvent id="boundarycompensation2" name="Compensate" attachedToRef="scripttask1" cancelActivity="true">
         <compensateEventDefinition></compensateEventDefinition>
       </boundaryEvent>
-      <scriptTask scriptFormat="javascript" id="scripttask6" name="转出补偿" isForCompensation="true" activiti:autoStoreVariables="false">
+      <scriptTask id="scripttask6" name="转出补偿" isForCompensation="true" scriptFormat="javascript" activiti:autoStoreVariables="false">
         <script><![CDATA[var from_balance = execution.getVariable("from_balance");
 var to_balance = execution.getVariable("to_balance");
 var amount = execution.getVariable("amount");
 
 execution.setVariable("from_balance",from_balance+amount);]]></script>
       </scriptTask>
-      <scriptTask scriptFormat="javascript" id="scripttask7" name="转入补偿" isForCompensation="true" activiti:autoStoreVariables="false">
+      <scriptTask id="scripttask7" name="转入补偿" isForCompensation="true" scriptFormat="javascript" activiti:autoStoreVariables="false">
         <script><![CDATA[var from_balance = execution.getVariable("from_balance");
 var to_balance = execution.getVariable("to_balance");
 var amount = execution.getVariable("amount");
@@ -69,24 +73,24 @@ execution.setVariable("to_balance", to_balance-amount);]]></script>
     <boundaryEvent id="boundaryerror1" name="Error" attachedToRef="transaction1">
       <errorEventDefinition errorRef="NORMAL_ERROR"></errorEventDefinition>
     </boundaryEvent>
-    <scriptTask scriptFormat="javascript" id="scripttask3" name="错误操作" activiti:autoStoreVariables="false">
+    <scriptTask id="scripttask3" name="错误操作" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <script><![CDATA[execution.setVariable("error","事务错误");]]></script>
     </scriptTask>
     <sequenceFlow id="flow8" sourceRef="boundaryerror1" targetRef="scripttask3"></sequenceFlow>
-    <scriptTask scriptFormat="javascript" id="scripttask4" name="取消操作" activiti:autoStoreVariables="false">
+    <scriptTask id="scripttask4" name="取消操作" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <script><![CDATA[execution.setVariable("cancel","事务取消");]]></script>
     </scriptTask>
     <sequenceFlow id="flow9" sourceRef="boundarycancel1" targetRef="scripttask4"></sequenceFlow>
     <endEvent id="endevent3" name="End"></endEvent>
     <sequenceFlow id="flow10" sourceRef="scripttask4" targetRef="endevent3"></sequenceFlow>
-    <endEvent id="endevent4" name="End"></endEvent>
-    <sequenceFlow id="flow11" sourceRef="scripttask3" targetRef="endevent4"></sequenceFlow>
-    <scriptTask scriptFormat="javascript" id="scripttask5" name="操作成功" activiti:autoStoreVariables="false">
+    <scriptTask id="scripttask5" name="操作成功" scriptFormat="javascript" activiti:autoStoreVariables="false">
       <script><![CDATA[execution.setVariable("success","事务成功");]]></script>
     </scriptTask>
     <sequenceFlow id="flow12" sourceRef="transaction1" targetRef="scripttask5"></sequenceFlow>
     <endEvent id="endevent5" name="End"></endEvent>
     <sequenceFlow id="flow13" sourceRef="scripttask5" targetRef="endevent5"></sequenceFlow>
+    <endEvent id="endevent6" name="End"></endEvent>
+    <sequenceFlow id="flow14" sourceRef="scripttask3" targetRef="endevent6"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_transactionProcess">
     <bpmndi:BPMNPlane bpmnElement="transactionProcess" id="BPMNPlane_transactionProcess">
@@ -141,14 +145,14 @@ execution.setVariable("to_balance", to_balance-amount);]]></script>
       <bpmndi:BPMNShape bpmnElement="endevent3" id="BPMNShape_endevent3">
         <omgdc:Bounds height="35.0" width="35.0" x="1100.0" y="620.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent4" id="BPMNShape_endevent4">
-        <omgdc:Bounds height="35.0" width="35.0" x="795.0" y="620.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask5" id="BPMNShape_scripttask5">
         <omgdc:Bounds height="55.0" width="105.0" x="1120.0" y="317.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent5" id="BPMNShape_endevent5">
         <omgdc:Bounds height="35.0" width="35.0" x="1270.0" y="327.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent6" id="BPMNShape_endevent6">
+        <omgdc:Bounds height="35.0" width="35.0" x="795.0" y="620.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
         <omgdi:waypoint x="335.0" y="307.0"></omgdi:waypoint>
@@ -200,10 +204,6 @@ execution.setVariable("to_balance", to_balance-amount);]]></script>
         <omgdi:waypoint x="1055.0" y="637.0"></omgdi:waypoint>
         <omgdi:waypoint x="1100.0" y="637.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
-        <omgdi:waypoint x="750.0" y="637.0"></omgdi:waypoint>
-        <omgdi:waypoint x="795.0" y="637.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
         <omgdi:waypoint x="1091.0" y="345.0"></omgdi:waypoint>
         <omgdi:waypoint x="1120.0" y="344.0"></omgdi:waypoint>
@@ -211,6 +211,10 @@ execution.setVariable("to_balance", to_balance-amount);]]></script>
       <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
         <omgdi:waypoint x="1225.0" y="344.0"></omgdi:waypoint>
         <omgdi:waypoint x="1270.0" y="344.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="750.0" y="637.0"></omgdi:waypoint>
+        <omgdi:waypoint x="795.0" y="637.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
