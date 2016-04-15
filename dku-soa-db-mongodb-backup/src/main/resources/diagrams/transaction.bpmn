@@ -12,9 +12,16 @@
     <transaction id="transaction1" name="Transaction">
       <startEvent id="startevent2" name="Start"></startEvent>
       <scriptTask id="scripttask1" name="转出" scriptFormat="javascript" activiti:autoStoreVariables="false">
-        <script><![CDATA[var from_balance = execution.getVariable("from_balance");
+        <script><![CDATA[
+var from_balance = execution.getVariable("from_balance");
 var to_balance = execution.getVariable("to_balance");
 var amount = execution.getVariable("amount");
+
+var res = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", java.lang.String.class,
+		new Array());
+
+
+execution.setVariable("res",res);
 
 execution.setVariable("from_balance",from_balance-amount);]]></script>
       </scriptTask>

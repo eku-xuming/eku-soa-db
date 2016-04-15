@@ -6,6 +6,9 @@ import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Resource;
 
 import org.activiti.engine.HistoryService;
 import org.activiti.engine.RepositoryService;
@@ -17,12 +20,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.client.RestTemplate;
 
-//@RunWith(SpringJUnit4ClassRunner.class)
-// @ContextConfiguration(locations = "classpath*:srping/*.xml")
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("classpath*:/spring/*.xml")
 public class ProcessTestMyProcess {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessTestMyProcess.class);
 
@@ -31,17 +34,35 @@ public class ProcessTestMyProcess {
 
 	// @Rule
 	// public ActivitiRule activitiRule = new ActivitiRule();
-	// @Autowired
+	@Resource(name = "runtimeService")
 	private RuntimeService runtimeService;
-	// @Autowired
+	@Resource(name = "historyService")
 	private HistoryService historyService;
-	// @Autowired
+	@Resource(name = "repositoryService")
 	private RepositoryService repositoryService;
+
+	@Resource
+	private RestTemplate restTemplate;
+
+	public static void main(String[] args) {
+		String url = "http://gturnquist-quoters.cfapps.io/api/random";
+		RestTemplate rest = new RestTemplate();
+		@SuppressWarnings("unchecked")
+		HashMap<String, String> res = rest.getForObject(url, HashMap.class, new Object[] {});
+
+		Set<String> keys = res.keySet();
+		for (String key : keys) {
+			System.out.println(String.format("key:%s\tvalue:%s", key, res.get(key)));
+		}
+	}
 
 	@Before
 	public void before() {
-		ApplicationContext context = new ClassPathXmlApplicationContext("spring/*.xml");
-		System.out.println("context");
+		// ApplicationContext context = new
+		// ClassPathXmlApplicationContext("spring/*.xml");
+		// repositoryService = (RepositoryService)
+		// context.getBean("repositoryService");
+		// System.out.println("context");
 	}
 
 	@Test
@@ -49,12 +70,17 @@ public class ProcessTestMyProcess {
 		repositoryService.createDeployment().addInputStream("transaction.bpmn20.xml", new FileInputStream(filename))
 				.deploy();
 
+		String res = restTemplate.getForObject("http://gturnquist-quoters.cfapps.io/api/random", String.class,
+				new Object[] {});
+		System.out.println(res);
+
 		Map<String, Object> variableMap = new HashMap<String, Object>();
 		variableMap.put("rollback", false);
 		variableMap.put("from_balance", 3000);
 		variableMap.put("to_balance", 1000);
 		variableMap.put("amount", 100);
 		variableMap.put("error_event", false);
+		variableMap.put("res", false);
 
 		ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess", variableMap);
 		assertNotNull(processInstance.getId());

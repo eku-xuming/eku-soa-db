@@ -27,6 +27,7 @@
 		<property name="transactionManager" ref="transactionManager" />
 		<property name="databaseSchemaUpdate" value="true" />
 		<property name="jobExecutorActivate" value="false" />
+		<property name="history" value="full" />
 	</bean>
 
 	<bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
@@ -43,4 +44,9 @@
 		factory-method="getHistoryService" />
 	<bean id="managementService" factory-bean="processEngine"
 		factory-method="getManagementService" />
+
+	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate" />
+	<bean id="printer" class="com.eku001.soa.bpm.activiti.utils.Printer" />
+
+	<import resource="camel.xml" />
 </beans>

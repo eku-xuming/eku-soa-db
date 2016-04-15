@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+	xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+	typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+	targetNamespace="http://www.activiti.org/test">
+	<process id="camelProcess" name="camel Process" isExecutable="true">
+		<startEvent id="start" name="Start"></startEvent>
+		<serviceTask id="camel1" name="Service Task"
+			activiti:type="camel"></serviceTask>
+		<serviceTask id="servicetask2" name="Service Task"
+			activiti:expression="#{printer.printMessage(&quot;xxx&quot;)}"></serviceTask>
+		<sequenceFlow id="flow1" sourceRef="start" targetRef="camel1"></sequenceFlow>
+		<sequenceFlow id="flow2" sourceRef="camel1" targetRef="servicetask2"></sequenceFlow>
+		<endEvent id="endevent1" name="End"></endEvent>
+		<sequenceFlow id="flow3" sourceRef="servicetask2"
+			targetRef="endevent1"></sequenceFlow>
+	</process>
+	<bpmndi:BPMNDiagram id="BPMNDiagram_camelProcess">
+		<bpmndi:BPMNPlane bpmnElement="camelProcess"
+			id="BPMNPlane_camelProcess">
+			<bpmndi:BPMNShape bpmnElement="start" id="BPMNShape_start">
+				<omgdc:Bounds height="35.0" width="35.0" x="280.0" y="390.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="camel1" id="BPMNShape_camel1">
+				<omgdc:Bounds height="55.0" width="105.0" x="500.0" y="380.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="servicetask2"
+				id="BPMNShape_servicetask2">
+				<omgdc:Bounds height="55.0" width="105.0" x="810.0" y="380.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+				<omgdc:Bounds height="35.0" width="35.0" x="1000.0" y="390.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+				<omgdi:waypoint x="315.0" y="407.0"></omgdi:waypoint>
+				<omgdi:waypoint x="500.0" y="407.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+				<omgdi:waypoint x="605.0" y="407.0"></omgdi:waypoint>
+				<omgdi:waypoint x="810.0" y="407.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+				<omgdi:waypoint x="915.0" y="407.0"></omgdi:waypoint>
+				<omgdi:waypoint x="1000.0" y="407.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+		</bpmndi:BPMNPlane>
+	</bpmndi:BPMNDiagram>
+</definitions>
